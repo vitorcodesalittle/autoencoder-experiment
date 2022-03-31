@@ -1,8 +1,10 @@
+import torch
 from torch import nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from evaluate import evaluate_classifier
 
-def trainingStats(history):
+def training_stats(history):
   plt.plot(
     history['accuracy'],
   )
@@ -17,10 +19,10 @@ def trainingStats(history):
   plt.legend(['loss'])
   plt.show()
   
-def train(model, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
+def train(model, dataloader, testloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
   history = { 'loss': [], 'iloss': [], 'accuracy': [], 'test_accuracy': []}
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
-  N = trainloader.dataset.data.shape[0]
+  N = dataloader.dataset.data.shape[0]
   for epoch in range(epochs):  # loop over the dataset multiple times
     running_loss = .0
     running_acc = .0
@@ -48,13 +50,14 @@ def train(model, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.Cr
           print(f'[{epoch + 1}, {i + 1:5d}/{N//dataloader.batch_size}] loss: {running_loss / infostep:.3f} acc: {running_acc / (infostep*dataloader.batch_size):.3f}')
           running_loss = .0
           running_acc = .0
-    testhistory = evaluate(model, testloader)
+    if testloader:
+        testhistory = evaluate_classifier(model, testloader)
+        history['test_accuracy'].append(testhistory['accuracy'])
     history['accuracy'].append(total_acc / N)
     history['loss'].append(total_loss/ N)
-    history['test_accuracy'].append(testhistory['accuracy'])
   return history
 
-def trainAutoEncoder(model, dataloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
+def train_auto_encoder(model, dataloader, criterion, epochs=3, lr=5e-3, momentum=0.7, debug=False):
   history = { 'loss': [], 'iloss': [] }
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
   N = dataloader.dataset.data.shape[0]

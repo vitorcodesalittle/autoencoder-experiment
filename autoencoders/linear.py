@@ -1,5 +1,4 @@
 from torch import nn
-from torch.functional import F
 class AutoencoderLinear(nn.Module):
   def __init__(self):
     super(AutoencoderLinear, self).__init__()

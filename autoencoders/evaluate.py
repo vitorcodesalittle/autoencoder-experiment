@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 def evaluate_classifier(model, dataloader, debug=False):
   acc = 0
-  for i, (x, ytrue) in enumerate(dataloader):
+  for (x, ytrue) in dataloader:
     y = torch.argmax(model(x), 1)
     acc += torch.sum(y == ytrue)
   acc = acc / dataloader.dataset.data.shape[0]

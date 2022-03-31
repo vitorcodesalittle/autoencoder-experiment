@@ -7,11 +7,11 @@ from datetime import datetime
 from torch import nn
 
 from linear import AutoencoderLinear
-from train import trainAutoEncoder
+from train import train_auto_encoder
 from data import load_data
 from evaluate import plot_training_learning
 
-description = """Train and evaluate autoencoders"""
+DESCRIPTION = """Train and evaluate autoencoders"""
 
 DATAPATH = 'data'
 MODELSPATH = '.models'
@@ -29,12 +29,12 @@ def getlastid(modelname):
     return modelids[-1], historyids[-1]
 
 def main(models, skip_train, epochs=3, show_iteration_loss=False):
-    trainloader, testloader = load_data()
+    trainloader, _ = load_data()
     criterion = nn.MSELoss()
     if LINEAR_MODEL in models:
         if not skip_train:
             linearmodel = AutoencoderLinear()
-            history = trainAutoEncoder(linearmodel, trainloader, epochs=epochs, momentum=0.9, debug=True, criterion=criterion)
+            history = train_auto_encoder(linearmodel, trainloader,lr=5e-2, epochs=epochs, momentum=0.9, debug=True, criterion=criterion)
             id = datetime.now().isoformat()
             torch.save(linearmodel, path.join(MODELSPATH, LINEAR_MODEL + id))
             torch.save(history, path.join(HISTORIESPATH, LINEAR_MODEL + id))
@@ -52,7 +52,7 @@ def main(models, skip_train, epochs=3, show_iteration_loss=False):
             print('Convolutional Autoencoder with classifier not implemented')
 
 
-parser = argparse.ArgumentParser(description=description)
+parser = argparse.ArgumentParser(description=DESCRIPTION)
 parser.add_argument('models', choices=MODELS, nargs='*',
                     help='models to be trained or evaluated')
 parser.add_argument('--skip-train', '-s', dest='skip_train', action='store_true',
