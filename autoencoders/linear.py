@@ -24,11 +24,3 @@ class AutoencoderLinear(nn.Module):
     x = self.f(x)
     return x
 
-
-model = AutoencoderLinear()
-summary(model, (32, 32, 3))
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True)
-testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False)
-history = trainAutoEncoder(model, epochs=20, momentum=0.9, debug=True, criterion=nn.MSELoss())
-trainingStats(history)
-

@@ -1,5 +1,4 @@
 from torch import nn
-from torchsummary import summary
 import torch.optim as optim
 import matplotlib.pyplot as plt
 
@@ -18,7 +17,7 @@ def trainingStats(history):
   plt.legend(['loss'])
   plt.show()
   
-def train(model, dataloader=trainloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
+def train(model, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
   history = { 'loss': [], 'accuracy': [], 'test_accuracy': []}
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
   N = trainloader.dataset.data.shape[0]
@@ -55,10 +54,10 @@ def train(model, dataloader=trainloader, epochs=3, lr=5e-3, momentum=0.7, debug=
     history['test_accuracy'].append(testhistory['accuracy'])
   return history
 
-def trainAutoEncoder(model, dataloader=trainloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
+def trainAutoEncoder(model, dataloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
   history = { 'loss': []}
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
-  N = trainloader.dataset.data.shape[0]
+  N = dataloader.dataset.data.shape[0]
   for epoch in range(epochs):  # loop over the dataset multiple times
     running_loss = .0
     total_loss = .0
