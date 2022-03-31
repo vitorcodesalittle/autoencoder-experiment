@@ -18,7 +18,7 @@ def trainingStats(history):
   plt.show()
   
 def train(model, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
-  history = { 'loss': [], 'accuracy': [], 'test_accuracy': []}
+  history = { 'loss': [], 'iloss': [], 'accuracy': [], 'test_accuracy': []}
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
   N = trainloader.dataset.data.shape[0]
   for epoch in range(epochs):  # loop over the dataset multiple times
@@ -55,7 +55,7 @@ def train(model, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.Cr
   return history
 
 def trainAutoEncoder(model, dataloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
-  history = { 'loss': []}
+  history = { 'loss': [], 'iloss': [] }
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
   N = dataloader.dataset.data.shape[0]
   for epoch in range(epochs):  # loop over the dataset multiple times
@@ -73,6 +73,7 @@ def trainAutoEncoder(model, dataloader, epochs=3, lr=5e-3, momentum=0.7, debug=F
 
       # print statistics
       total_loss += loss.item()
+      history['iloss'].append(loss.item())
       if debug:
         running_loss += loss.item()
         infostep = 500

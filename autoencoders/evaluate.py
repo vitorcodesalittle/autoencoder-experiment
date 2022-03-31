@@ -1,4 +1,5 @@
 import torch
+import matplotlib.pyplot as plt
 
 def evaluate_classifier(model, dataloader, debug=False):
   acc = 0
@@ -13,4 +14,15 @@ def evaluate_classifier(model, dataloader, debug=False):
     print(info)
   return {'accuracy': acc.item()}
 
+
+def plot_training_learning(history, path=None):
+  for key in history:
+    plt.plot(
+      history[key],
+    )
+  plt.legend(history.keys())
+  if path:
+      plt.savefig(path)
+  else:
+      plt.show()
 
