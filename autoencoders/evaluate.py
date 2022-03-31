@@ -15,8 +15,10 @@ def evaluate_classifier(model, dataloader, debug=False):
   return {'accuracy': acc.item()}
 
 
-def plot_training_learning(history, path=None):
+def plot_training_learning(history, filterkeys=[], path=None):
   for key in history:
+    if key in filterkeys:
+      continue
     plt.plot(
       history[key],
     )

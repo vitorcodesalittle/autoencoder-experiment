@@ -28,7 +28,7 @@ def getlastid(modelname):
     historyids = [id for id in os.listdir(HISTORIESPATH) if modelname in id ]
     return modelids[-1], historyids[-1]
 
-def main(models, skip_train, epochs=3):
+def main(models, skip_train, epochs=3, show_iteration_loss=False):
     trainloader, testloader = load_data()
     criterion = nn.MSELoss()
     if LINEAR_MODEL in models:
@@ -43,7 +43,8 @@ def main(models, skip_train, epochs=3):
             print(f'modelid={modelid} historyid={historyid} - Skipped Training')
             linearmodel = torch.load(path.join(MODELSPATH, modelid))
             history = torch.load(path.join(HISTORIESPATH, modelid))
-        plot_training_learning(history)
+        filterkeys = ['iloss'] if not show_iteration_loss  else []
+        plot_training_learning(history, filterkeys=filterkeys)
 
     if CONVAE_MODEL in models:
         print('Convolutional Autoencoder is not implemented')
@@ -58,6 +59,8 @@ parser.add_argument('--skip-train', '-s', dest='skip_train', action='store_true'
                     default=False,
                     help='Skip training and just evaluate')
 parser.add_argument('--epochs', '-e', dest='epochs', help='Epochs to iterate with optimizer', type=int, default=3)
+parser.add_argument('--show-iteration-loss', help='Show iteration loss', dest="show_iteration_loss", action="store_true", default=False)
+
 args = parser.parse_args()
 
 if not path.isdir(MODELSPATH):
@@ -65,4 +68,5 @@ if not path.isdir(MODELSPATH):
 if not path.isdir(HISTORIESPATH):
     os.mkdir(HISTORIESPATH)
 
-main(args.models, epochs=args.epochs, skip_train=args.skip_train)
+main(args.models, epochs=args.epochs, skip_train=args.skip_train, show_iteration_loss=args.show_iteration_loss)
+
