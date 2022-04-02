@@ -26,14 +26,17 @@ def getlastid(modelname):
     modelids = [ id for id in os.listdir(MODELSPATH) if modelname in id ]
     modelids.sort()
     historyids = [id for id in os.listdir(HISTORIESPATH) if modelname in id ]
+    historyids.sort()
     return modelids[-1], historyids[-1]
 
-def runtrain(model, trainloader, epochs, criterion):
+def runtrain(modelname, trainloader, epochs, criterion):
+    model = create_model(modelname)
+    summary(model, INPUT_SIZE)
     history = train_auto_encoder(model, trainloader,lr=5e-2, epochs=epochs, momentum=0.9, debug=True, criterion=criterion)
     id = datetime.now().isoformat()
     torch.save(model, path.join(MODELSPATH, LINEAR_MODEL + id))
     torch.save(history, path.join(HISTORIESPATH, LINEAR_MODEL + id))
-    return history
+    return model, history
 
 def get_last_model_and_history(modelname):
     modelid, historyid = getlastid(modelname)
@@ -57,9 +60,7 @@ def main(models, skip_train, epochs=3, show_iteration_loss=False):
     criterion = nn.MSELoss()
     for modelname in models:
         if not skip_train:
-            model = create_model(modelname)
-            summary(model, INPUT_SIZE)
-            history = runtrain(model, trainloader, epochs, criterion)
+            model, history = runtrain(modelname, trainloader, epochs, criterion)
         else:
             model, history = get_last_model_and_history(modelname)
             summary(model, INPUT_SIZE)
