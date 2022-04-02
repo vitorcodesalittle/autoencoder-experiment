@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "presentation": "marp -s ."
+  },
   "dependencies": {
     "@marp-team/marp-core": "^3.0.2"
   },
