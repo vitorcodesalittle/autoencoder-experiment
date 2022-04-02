@@ -5,21 +5,21 @@ import torch
 from os import path
 from datetime import datetime
 from torch import nn
+from torchsummary import summary
 
-from linear import AutoencoderLinear
+from models import AutoencoderConvClassifier, AutoencoderLinear, AutoencoderConv
 from train import train_auto_encoder
 from data import load_data
 from evaluate import plot_training_learning
 
 DESCRIPTION = """Train and evaluate autoencoders"""
-
 DATAPATH = 'data'
 MODELSPATH = '.models'
 HISTORIESPATH = '.histories'
-
-LINEAR_MODEL = 'linearae'
+LINEAR_MODEL = 'linearae' # I'd like to put model names in models.py later
 CONVAE_MODEL = 'convae'
 CONVAE_CONVCL_MODEL = 'convae_convcl'
+INPUT_SIZE = (3, 32, 32)
 MODELS = [LINEAR_MODEL, CONVAE_MODEL, CONVAE_CONVCL_MODEL]
 
 def getlastid(modelname):
@@ -28,29 +28,49 @@ def getlastid(modelname):
     historyids = [id for id in os.listdir(HISTORIESPATH) if modelname in id ]
     return modelids[-1], historyids[-1]
 
+def runtrain(model, trainloader, epochs, criterion):
+    history = train_auto_encoder(model, trainloader,lr=5e-2, epochs=epochs, momentum=0.9, debug=True, criterion=criterion)
+    id = datetime.now().isoformat()
+    torch.save(model, path.join(MODELSPATH, LINEAR_MODEL + id))
+    torch.save(history, path.join(HISTORIESPATH, LINEAR_MODEL + id))
+    return history
+
+def get_last_model_and_history(modelname):
+    modelid, historyid = getlastid(modelname)
+    print(f'modelid={modelid} historyid={historyid} - Skipped Training')
+    model = torch.load(path.join(MODELSPATH, modelid))
+    history = torch.load(path.join(HISTORIESPATH, modelid))
+    return model, history
+
+def create_model(modelName):
+    if modelName == LINEAR_MODEL:
+        return AutoencoderLinear()
+    elif modelName == CONVAE_MODEL:
+        return AutoencoderConv()
+    elif modelName == CONVAE_CONVCL_MODEL:
+        return AutoencoderConvClassifier()
+    else:
+        raise Exception(f'No model after "{modelName}"')
+
 def main(models, skip_train, epochs=3, show_iteration_loss=False):
     trainloader, _ = load_data()
     criterion = nn.MSELoss()
-    if LINEAR_MODEL in models:
+    for modelname in models:
         if not skip_train:
-            linearmodel = AutoencoderLinear()
-            history = train_auto_encoder(linearmodel, trainloader,lr=5e-2, epochs=epochs, momentum=0.9, debug=True, criterion=criterion)
-            id = datetime.now().isoformat()
-            torch.save(linearmodel, path.join(MODELSPATH, LINEAR_MODEL + id))
-            torch.save(history, path.join(HISTORIESPATH, LINEAR_MODEL + id))
+            model = create_model(modelname)
+            summary(model, INPUT_SIZE)
+            history = runtrain(model, trainloader, epochs, criterion)
         else:
-            modelid, historyid = getlastid(LINEAR_MODEL)
-            print(f'modelid={modelid} historyid={historyid} - Skipped Training')
-            linearmodel = torch.load(path.join(MODELSPATH, modelid))
-            history = torch.load(path.join(HISTORIESPATH, modelid))
-        filterkeys = ['iloss'] if not show_iteration_loss  else []
+            model, history = get_last_model_and_history(modelname)
+            summary(model, INPUT_SIZE)
+        filterkeys = ['iloss'] if not show_iteration_loss else []
         plot_training_learning(history, filterkeys=filterkeys)
 
-    if CONVAE_MODEL in models:
-        print('Convolutional Autoencoder is not implemented')
-    if CONVAE_CONVCL_MODEL in models:
-            print('Convolutional Autoencoder with classifier not implemented')
-
+# setup
+if not path.isdir(MODELSPATH):
+    os.mkdir(MODELSPATH)
+if not path.isdir(HISTORIESPATH):
+    os.mkdir(HISTORIESPATH)
 
 parser = argparse.ArgumentParser(description=DESCRIPTION)
 parser.add_argument('models', choices=MODELS, nargs='*',
@@ -62,11 +82,6 @@ parser.add_argument('--epochs', '-e', dest='epochs', help='Epochs to iterate wit
 parser.add_argument('--show-iteration-loss', help='Show iteration loss', dest="show_iteration_loss", action="store_true", default=False)
 
 args = parser.parse_args()
-
-if not path.isdir(MODELSPATH):
-    os.mkdir(MODELSPATH)
-if not path.isdir(HISTORIESPATH):
-    os.mkdir(HISTORIESPATH)
 
 main(args.models, epochs=args.epochs, skip_train=args.skip_train, show_iteration_loss=args.show_iteration_loss)
 
