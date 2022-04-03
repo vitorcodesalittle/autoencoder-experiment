@@ -10,7 +10,7 @@ from torchsummary import summary
 from models import AutoencoderConvClassifier, AutoencoderLinear, AutoencoderConv
 from train import train_auto_encoder
 from data import load_data
-from evaluate import plot_training_learning
+from evaluate import plot_training_learning, evaluate_autoencoder, visualize_autoencoded
 
 DESCRIPTION = """Train and evaluate autoencoders"""
 DATAPATH = 'data'
@@ -56,7 +56,7 @@ def create_model(modelName):
         raise Exception(f'No model after "{modelName}"')
 
 def main(models, skip_train, epochs=3, show_iteration_loss=False):
-    trainloader, _ = load_data()
+    trainloader, testloader = load_data()
     criterion = nn.MSELoss()
     for modelname in models:
         if not skip_train:
@@ -66,6 +66,10 @@ def main(models, skip_train, epochs=3, show_iteration_loss=False):
             summary(model, INPUT_SIZE)
         filterkeys = ['iloss'] if not show_iteration_loss else []
         plot_training_learning(history, filterkeys=filterkeys)
+        batch = next(iter(testloader))
+        input_batch = batch[0]
+        input_batch = [ input_batch[0], input_batch[1] ]
+        visualize_autoencoded(model,input_batch)
 
 # setup
 if not path.isdir(MODELSPATH):

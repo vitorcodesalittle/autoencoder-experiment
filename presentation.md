@@ -3,6 +3,12 @@ marp: true
 theme: gaia
 ---
 
+<!-- Referências:
+
+https://icml.cc/2011/papers/455_icmlpaper.pdf
+
+-->
+
 # Autoencoders
 
 **Vitor Lopes Maia Albuquerque <vlma@cin.ufpe.br>**
@@ -19,20 +25,20 @@ theme: gaia
 
 # 1) O que é um Autoencoder
 
-![w:860 center](./images/autoencoder-net.png)
-
 <!-- Um autoencoder é uma rede neural que mapeia a entrada a própria entrada, por meio de uma representação intermediária,
 sendo portanto um método de aprendizado não supervisionado. O interesse por trás dos autoencoders está na facilidade
 do treinamento, e em usos criativos do bloco encoder e decoder, tal como das representações intermediárias. -->
-
----
-
-# 1) O que é um autoencoder?
 
 - É um tipo de rede neural composta por blocos do tipo **decoder** e **encoder**
 - O decoder e o encoder são treinados em conjunto para compor uma função identidade.
 - Isso torna o treinamento fácil, visto que a entrada é seu próprio alvo
 - A representação intermediária, ou latente, é um código para a entrada, e tende a ser representativo se o treino ocorreu apropriadamente
+
+---
+
+# 1) O que é um Autoencoder
+
+![w:860 center](./images/autoencoder-net.png)
 
 ---
 
@@ -46,26 +52,42 @@ Além disso, autoencoders que puramente aprender a função identidade as vezes 
 cada exemplo do conjunto de treinamento. Então alguns autoencoders tem sua função de perda modificadas para se ter propriedades mais gerais dos dados de entrada, um uma propriedade de interesse.
  -->
 
-## Autoencoder Regularizado
+## Autoencoder Denoising
 
-- Autoencoder Denoising
 <!--
 Aplicação de ruído aos dados de entrada, para se aprender uma representação masi robusta
 -->
-- Autoencoder Esparso
+
+![w:860](./images/denoising.png)
+
+---
+
+## Autoencoder Esparso
+
+![w:860](./images/sparse-autoencoder-penalty.png)
+
 <!--
 Como exemplos desses autoencoders temos o Autoencoder esparso, que aplica penalização L1 na função de perda, criando uma representação mais esparsa.
+https://www.deeplearningbook.com.br/capitulo-22-regularizacao-l1/
 -->
-- Contractive Autoencoders
+
+---
+
+## Contractive Autoencoders
+
+![w:860](./images/contractive-penalty.png)
+
 <!--
 Contractive autoencoders
-Mais um autoencoder regularizado, mas cujo
+Mais um autoencoder regularizado, mas com um termo de penalidade da função de perda sendo a Norma Matricial com p = 2
+https://pt.wikipedia.org/wiki/Norma_matricial
 -->
 
-## Outros autoencoders
+---
 
-- Deep Autoencoders
-- Variational Autoencoders
+## Variational Autoencoder
+
+![h:300](./images/variational-autoencoder.png)
 
 ---
 
@@ -74,6 +96,8 @@ Mais um autoencoder regularizado, mas cujo
 Aqui eu falo sobre a importância dos autoencoders, dando um enfoque nas aplicações que
 o autoencoder tornou mais eficiente, ou possível. Além da importância dos autoencoders para
 gerar feature maps para outros problemas.
+
+![h:500](./images/variational.gif)
 
 ---
 
