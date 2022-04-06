@@ -52,7 +52,14 @@ Além disso, autoencoders que puramente aprender a função identidade as vezes 
 cada exemplo do conjunto de treinamento. Então alguns autoencoders tem sua função de perda modificadas para se ter propriedades mais gerais dos dados de entrada, um uma propriedade de interesse.
  -->
 
+ Falar um pouco sobre a motivação para modificações no autoencoders
+ 
+---
+
 ## Autoencoder Denoising
+- Vincent, Pascal, et al. "Extracting and composing robust features with denoising autoencoders." Proceedings of the 25th international conference on Machine learning. 2008.
+
+
 
 <!--
 Aplicação de ruído aos dados de entrada, para se aprender uma representação masi robusta
@@ -63,6 +70,10 @@ Aplicação de ruído aos dados de entrada, para se aprender uma representação
 ---
 
 ## Autoencoder Esparso
+
+- Le, Quoc V. "Building high-level features using large scale unsupervised learning." 2013 IEEE international conference on acoustics, speech and signal processing. IEEE, 2013.
+
+- Regularização L1
 
 ![w:860](./images/sparse-autoencoder-penalty.png)
 
@@ -77,9 +88,15 @@ https://www.deeplearningbook.com.br/capitulo-22-regularizacao-l1/
 
 ![w:860](./images/contractive-penalty.png)
 
+
+
+
 <!--
 Contractive autoencoders
-Mais um autoencoder regularizado, mas com um termo de penalidade da função de perda sendo a Norma Matricial com p = 2
+Mais um autoencoder regularizado, mas com um termo de penalidade da função de perda com penalidade L2
+
+No processo de autalização dos pesos, a penalização L2 é proporcional ao tamanho dos pesos, enquanto a L! é constante
+
 https://pt.wikipedia.org/wiki/Norma_matricial
 -->
 
@@ -96,6 +113,9 @@ https://pt.wikipedia.org/wiki/Norma_matricial
 Aqui eu falo sobre a importância dos autoencoders, dando um enfoque nas aplicações que
 o autoencoder tornou mais eficiente, ou possível. Além da importância dos autoencoders para
 gerar feature maps para outros problemas.
+
+- Feature Learning, (Hinton & Salakhutdinov, 2006; Bengio et al., 2007)
+- Sparse coding
 
 ![h:500](./images/variational.gif)
 
