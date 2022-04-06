@@ -9,6 +9,8 @@ Um pequeno roadmap para isso ficar entregável:
   - Autoencoder Linear 1024 x AutoecoderLinear 512 x AutoencoderLinear 256 x AutoencoderLinear 64
   - Autoencoder Conv 64 x AutoencoderConv 32 x AutoencoderConv 16 x AutoencoderConv 8
   - Classificadores_Autoencoder_{Linear,Conv} X entre si
+  - Melhores Autoencoders com e sem BatchNormalization
+  - Autoencoders regularizados x não regularizados
 
 - Documentar tomadas de decisão
 
