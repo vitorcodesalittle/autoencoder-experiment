@@ -16,7 +16,7 @@ from exceptions import ModelNotFoundException
 
 DESCRIPTION = """Train and evaluate autoencoders"""
 DATAPATH = 'data'
-BATCH_SIZE=10
+BATCH_SIZE=50
 MODELSPATH = '.models'
 HISTORIESPATH = '.histories'
 LINEAR_MODEL = 'linearae' # I'd like to put model names in models.py later

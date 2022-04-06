@@ -110,11 +110,10 @@ https://pt.wikipedia.org/wiki/Norma_matricial
 
 # 2) Importância dos autoencoders
 
-Aqui eu falo sobre a importância dos autoencoders, dando um enfoque nas aplicações que
-o autoencoder tornou mais eficiente, ou possível. Além da importância dos autoencoders para
-gerar feature maps para outros problemas.
 
 - Feature Learning, (Hinton & Salakhutdinov, 2006; Bengio et al., 2007)
+
+---
 - Sparse coding
 
 ![h:500](./images/variational.gif)
