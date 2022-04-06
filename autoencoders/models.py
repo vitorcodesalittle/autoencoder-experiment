@@ -1,4 +1,5 @@
 from torch import nn
+from torch.nn.functional import relu, linear
 
 class AutoencoderLinear(nn.Module):
   def __init__(self):
@@ -63,8 +64,26 @@ class AutoencoderConv(nn.Module):
     return x
 
 
-class DecoderClassifier(nn.Module):
-    pass
+
+class CodeClassifier(nn.Module):
+    """
+    module that optimizes the classification of image based on it's encoded version
+    """
+    def __init__(self, autoencoder):
+        super(CodeClassifier, self).__init__()
+        autoencoder.require_grad = False
+        self.encoder = autoencoder.downsample
+        self.classifier = nn.Sequential(
+                nn.Flatten(),
+                nn.Linear(1024, 10),
+                nn.ReLU(),
+                nn.Softmax(dim=1)
+        )
+    # x is of shape (batch_size, 32, 32, 3)"
+    def forward(self, x):
+        x = self.encoder(x) # x is of shape (4, 4, 64)
+        x = self.classifier(x)
+        return x
 
 class AutoencoderConvClassifier(nn.Module):
     pass
