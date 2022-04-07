@@ -35,7 +35,7 @@ class AutoencoderLinear(nn.Module):
 class AutoencoderConv(nn.Module):
   def __init__(self):
     super(AutoencoderConv, self).__init__()
-    self.downsample = nn.Sequential(
+    self.encode = nn.Sequential(
         nn.Conv2d(in_channels=3, out_channels=256, kernel_size=4, stride=2), # ((32, 32) - (4, 4)) / 2 + 1 = (28, 28) / 2 + 1 = (14, 14) + 1  = (14, 14) + (1, 1) = (15, 15)
         nn.ReLU(),
         nn.Conv2d(in_channels=256, out_channels=64, kernel_size=3, stride=1), # ((15, 15) - (3, 3)) / 1 + 1 = (12, 12) + 1 = (12, 12) + (1, 1) = (13, 13)
@@ -50,7 +50,7 @@ class AutoencoderConv(nn.Module):
         nn.ReLU(),
     )
 
-    self.upsample = nn.Sequential(
+    self.decode = nn.Sequential(
         nn.ConvTranspose2d(in_channels=64, out_channels=16, kernel_size=3, stride=2, padding=(1,1)), # ((7, 7) + 2(1, 1) - (3, 3) / 1 + 1 = (6, 6) / 2 + 1 = 
         nn.ConvTranspose2d(in_channels=16, out_channels=16, kernel_size=3, stride=1), # (7, 7)
         nn.ConvTranspose2d(in_channels=16, out_channels=16, kernel_size=3, stride=1), # (9, 9)
@@ -59,8 +59,8 @@ class AutoencoderConv(nn.Module):
         nn.ConvTranspose2d(in_channels=256, out_channels=3, kernel_size=4, stride=2), # ((32, 32) - (4, 4)) / 2 + 1 = (28, 28) / 2 + 1 = (14, 14) + 1  = (14, 14) + (1, 1) = (15, 15)
     )
   def forward(self, x):
-    x = self.downsample(x)
-    x = self.upsample(x)
+    x = self.encode(x)
+    x = self.decode(x)
     return x
 
 
@@ -68,11 +68,12 @@ class AutoencoderConv(nn.Module):
 class CodeClassifier(nn.Module):
     """
     module that optimizes the classification of image based on it's encoded version
+    as this, is pretty bad
     """
     def __init__(self, autoencoder):
         super(CodeClassifier, self).__init__()
         autoencoder.require_grad = False
-        self.encoder = autoencoder.downsample
+        self.encoder = autoencoder.encode
         self.classifier = nn.Sequential(
                 nn.Flatten(),
                 nn.Linear(1024, 10),
@@ -86,4 +87,46 @@ class CodeClassifier(nn.Module):
         return x
 
 class AutoencoderConvClassifier(nn.Module):
-    pass
+    """
+    module that optimized the classification and the autoencoding problem together
+    to try learning low level features from auto encoding that helps to classify images, as well
+    as to compress the input
+    """
+    def __init__(self):
+        super(AutoencoderConvClassifier, self).__init__()
+        self.encode = nn.Sequential(
+            nn.Conv2d(in_channels=3, out_channels=256, kernel_size=4, stride=2), # ((32, 32) - (4, 4)) / 2 + 1 = (28, 28) / 2 + 1 = (14, 14) + 1  = (14, 14) + (1, 1) = (15, 15)
+            nn.ReLU(),
+            nn.Conv2d(in_channels=256, out_channels=64, kernel_size=3, stride=1), # ((15, 15) - (3, 3)) / 1 + 1 = (12, 12) + 1 = (12, 12) + (1, 1) = (13, 13)
+            nn.ReLU(),
+            nn.Conv2d(in_channels=64, out_channels=16, kernel_size=3, stride=1), # (11, 11)
+            nn.ReLU(),
+            nn.Conv2d(in_channels=16, out_channels=16, kernel_size=3, stride=1), # (9, 9)
+            nn.ReLU(),
+            nn.Conv2d(in_channels=16, out_channels=16, kernel_size=3, stride=1), # (7, 7)
+            nn.ReLU(),
+            nn.Conv2d(in_channels=16, out_channels=64, kernel_size=3, stride=2, padding=(1,1)), # ((7, 7) + 2(1, 1) - (3, 3) / 1 + 1 = (6, 6) / 2 + 1 = 
+            nn.ReLU(),
+        )
+
+        self.decode = nn.Sequential(
+            nn.ConvTranspose2d(in_channels=64, out_channels=16, kernel_size=3, stride=2, padding=(1,1)), # ((7, 7) + 2(1, 1) - (3, 3) / 1 + 1 = (6, 6) / 2 + 1 = 
+            nn.ConvTranspose2d(in_channels=16, out_channels=16, kernel_size=3, stride=1), # (7, 7)
+            nn.ConvTranspose2d(in_channels=16, out_channels=16, kernel_size=3, stride=1), # (9, 9)
+            nn.ConvTranspose2d(in_channels=16, out_channels=64, kernel_size=3, stride=1), # (11, 11)
+            nn.ConvTranspose2d(in_channels=64, out_channels=256, kernel_size=3, stride=1), # ((15, 15) - (3, 3)) / 1 + 1 = (12, 12) + 1 = (12, 12) + (1, 1) = (13, 13)
+            nn.ConvTranspose2d(in_channels=256, out_channels=3, kernel_size=4, stride=2), # ((32, 32) - (4, 4)) / 2 + 1 = (28, 28) / 2 + 1 = (14, 14) + 1  = (14, 14) + (1, 1) = (15, 15)
+        )
+        
+        self.classifier = nn.Sequential(
+                nn.Flatten(),
+                nn.Linear(1024, 10),
+                nn.ReLU(),
+                nn.Softmax(dim=1)
+        )
+
+    def forward(self, x):
+        x = self.encode(x)
+        xc = self.classifier(x)
+        x = self.decode(x)
+        return x, xc

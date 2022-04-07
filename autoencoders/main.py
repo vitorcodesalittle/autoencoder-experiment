@@ -8,8 +8,8 @@ from datetime import datetime
 from torch import nn
 from torchsummary import summary
 
-from models import AutoencoderLinear, AutoencoderConv, CodeClassifier
-from train import train_classifier, train_auto_encoder
+from models import AutoencoderLinear, AutoencoderConv, CodeClassifier, AutoencoderConvClassifier
+from train import train_classifier, train_auto_encoder, train_autoencoder_classifier
 from data import load_data
 from evaluate import plot_training_learning, visualize_autoencoded
 from exceptions import ModelNotFoundException
@@ -19,20 +19,21 @@ DATAPATH = 'data'
 BATCH_SIZE=50
 MODELSPATH = '.models'
 HISTORIESPATH = '.histories'
-LINEAR_MODEL = 'linearae' # I'd like to put model names in models.py later
+LINEAR_MODEL = 'linearae'
 CONVAE_MODEL = 'convae'
 CONV_CODE_CLASSIFIER = 'codecl'
+AUTOENCODER_CLASSIFIER = 'autocl'
 INPUT_SIZE = (3, 32, 32)
-MODELS = [LINEAR_MODEL, CONVAE_MODEL, CONV_CODE_CLASSIFIER]
+MODELS = [LINEAR_MODEL, CONVAE_MODEL, CONV_CODE_CLASSIFIER, AUTOENCODER_CLASSIFIER]
 CLASSIFIER_MODELS = [CONV_CODE_CLASSIFIER]
 
 def getlastid(modelname):
     modelids = [ filename for filename in os.listdir(MODELSPATH) if modelname in filename ]
     historyids = [filename for filename in os.listdir(HISTORIESPATH) if modelname in filename ]
-    modelids.sort()
-    historyids.sort()
     if len(modelids) == 0 or len(historyids) == 0:
         raise ModelNotFoundException(f'Missing model {modelname}')
+    modelids.sort()
+    historyids.sort()
     return modelids[-1], historyids[-1]
 
 def runtrain(modelname, trainloader, epochs, testloader):
@@ -42,6 +43,9 @@ def runtrain(modelname, trainloader, epochs, testloader):
     if modelname in CLASSIFIER_MODELS:
         print('Training a classifier')
         history = train_classifier(model, trainloader, testloader, lr=5e-2, epochs=epochs, momentum=0.9, debug=True)
+    elif modelname == AUTOENCODER_CLASSIFIER:
+        print('Training the autoencder and the classifier combined')
+        history = train_autoencoder_classifier(model, trainloader, testloader, lr=5e-3, epochs=epochs, momentum=0.9, debug=True)
     else:
         print('Training an autoencoder')
         history = train_auto_encoder(model, trainloader,lr=5e-2, epochs=epochs, momentum=0.9, debug=True, criterion=criterion)
@@ -72,6 +76,8 @@ def create_model(modelName) -> nn.Module:
             return CodeClassifier(model)
         except ModelNotFoundException:
             panic(f'Failed to load most recently trained {CONVAE_MODEL}. Is it under {MODELSPATH}?')
+    elif modelName == AUTOENCODER_CLASSIFIER:
+        return AutoencoderConvClassifier()
     else:
         panic(f'No model {modelName}')
 
