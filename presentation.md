@@ -52,14 +52,13 @@ Além disso, autoencoders que puramente aprender a função identidade as vezes 
 cada exemplo do conjunto de treinamento. Então alguns autoencoders tem sua função de perda modificadas para se ter propriedades mais gerais dos dados de entrada, um uma propriedade de interesse.
  -->
 
- Falar um pouco sobre a motivação para modificações no autoencoders
- 
+Falar um pouco sobre a motivação para modificações no autoencoders
+
 ---
 
 ## Autoencoder Denoising
+
 - Vincent, Pascal, et al. "Extracting and composing robust features with denoising autoencoders." Proceedings of the 25th international conference on Machine learning. 2008.
-
-
 
 <!--
 Aplicação de ruído aos dados de entrada, para se aprender uma representação masi robusta
@@ -88,9 +87,6 @@ https://www.deeplearningbook.com.br/capitulo-22-regularizacao-l1/
 
 ![w:860](./images/contractive-penalty.png)
 
-
-
-
 <!--
 Contractive autoencoders
 Mais um autoencoder regularizado, mas com um termo de penalidade da função de perda com penalidade L2
@@ -110,10 +106,10 @@ https://pt.wikipedia.org/wiki/Norma_matricial
 
 # 2) Importância dos autoencoders
 
-
 - Feature Learning, (Hinton & Salakhutdinov, 2006; Bengio et al., 2007)
 
 ---
+
 - Sparse coding
 
 ![h:500](./images/variational.gif)

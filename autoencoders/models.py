@@ -1,5 +1,4 @@
 from torch import nn
-from torch.nn.functional import relu, linear
 
 class AutoencoderLinear(nn.Module):
   def __init__(self):

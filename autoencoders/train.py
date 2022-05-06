@@ -91,12 +91,20 @@ def train_auto_encoder(model, dataloader, criterion, epochs=3, lr=5e-3, momentum
   return history
 
 # note: xtrue is the input of the network, x is the autoencoded. x and y are outputs
-def composed_loss(x, y, xtrue, ytrue, class_loss=nn.CrossEntropyLoss(), self_loss=nn.MSELoss()):
-    classl = class_loss(y, ytrue)
-    selfl = self_loss(x, xtrue)
-    return classl + selfl
+class ComposedLoss(nn.Module):
+    def __init__(self, class_loss=nn.CrossEntropyLoss(), self_loss=nn.MSELoss()):
+        super(ComposedLoss, self).__init__()
+        self.class_loss = class_loss
+        self.self_loss = self_loss
+    def forward(self, x, y, xtrue, ytrue):
+        return self.class_loss(y, ytrue) + self.self_loss(x, xtrue)
+
+# def composed_loss(x, y, xtrue, ytrue, class_loss=nn.CrossEntropyLoss(), self_loss=nn.MSELoss()):
+#     classl = class_loss(y, ytrue)
+#     selfl = self_loss(x, xtrue)
+#     return classl + selfl
     
-def train_autoencoder_classifier(model, dataloader, testloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = nn.CrossEntropyLoss()):
+def train_autoencoder_classifier(model, dataloader, testloader, epochs=3, lr=5e-3, momentum=0.7, debug=False, criterion = ComposedLoss()):
   history = { 'loss': [], 'iloss': [], 'accuracy': [], 'test_accuracy': []}
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
   N = dataloader.dataset.data.shape[0]
@@ -111,7 +119,7 @@ def train_autoencoder_classifier(model, dataloader, testloader, epochs=3, lr=5e-
 
       # forward + backward + optimize
       autoencoded, outputs = model(inputs)
-      loss = composed_loss(autoencoded, outputs, inputs, labels)
+      loss = criterion(autoencoded, outputs, inputs, labels)
       loss.backward()
       optimizer.step()
 

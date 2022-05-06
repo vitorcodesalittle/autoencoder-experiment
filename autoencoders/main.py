@@ -81,8 +81,8 @@ def create_model(modelName) -> nn.Module:
     else:
         panic(f'No model {modelName}')
 
-def main(models, skip_train, epochs=3, show_iteration_loss=False):
-    trainloader, testloader = load_data(BATCH_SIZE)
+def main(models, skip_train, epochs=3, show_iteration_loss=False, batch_size=BATCH_SIZE):
+    trainloader, testloader = load_data(batch_size)
     for modelname in models:
         if not skip_train:
             model, history = runtrain(modelname, trainloader, epochs, testloader)
@@ -110,8 +110,9 @@ parser.add_argument('--skip-train', '-s', dest='skip_train', action='store_true'
                     help='Skip training and just evaluate')
 parser.add_argument('--epochs', '-e', dest='epochs', help='Epochs to iterate with optimizer', type=int, default=3)
 parser.add_argument('--show-iteration-loss', help='Show iteration loss', dest="show_iteration_loss", action="store_true", default=False)
+parser.add_argument('--batch-size', help='Specify size of batches', type=int, dest="batch_size", default=BATCH_SIZE)
 
 args = parser.parse_args()
 
-main(args.models, epochs=args.epochs, skip_train=args.skip_train, show_iteration_loss=args.show_iteration_loss)
+main(args.models, epochs=args.epochs, skip_train=args.skip_train, show_iteration_loss=args.show_iteration_loss, batch_size=args.batch_size)
 
